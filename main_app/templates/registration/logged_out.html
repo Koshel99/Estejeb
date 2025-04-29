@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% comment %} main_app/templates/registration/logged_out.html {% endcomment %}
+
+
+{% block content %}
+  <h1>You're logged out</h1>
+  <p>Thanks for visiting! Come back soon.</p>
+  <a href="{% url 'login' %}">Log in again</a>
+{% endblock %}

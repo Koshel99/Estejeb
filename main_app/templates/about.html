@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load static %} 
+
+<link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}">
+
+{% comment %} main_app/templates/about.html {% endcomment %}
+
+{% block content %}
+    <!-- Banner Image (Full width) -->
+    <section class="about-banner">
+        <img src="{% static 'images/aboutbanner.jpg' %}" alt="Estejeb Banner" />
+    </section>
+
+    {% comment %} <!-- About Section with Left Image and Right Text -->
+    <section class="about-section">
+        <div class="about-content">
+            <!-- Left-side image -->
+            <div class="about-image">
+                <img src="{% static 'images/aboutphoto.jpg' %}" alt="About Estejeb Image" />
+            </div> {% endcomment %}
+
+            <!-- Right-side text -->
+            <div class="about-text">
+                <h1 class="about-title">Estejeb! - Connecting Volunteers to Causes</h1>
+                <hr class="divider" />
+                <p class="page-content">
+                    At Estejeb, we believe that the spirit of giving lives within each one of us. Every day, we hear people in Bahrain talking about how they want to make a difference and create lasting change. Whether it’s through small acts of kindness or big community projects, the desire to help is universal, and it’s something that can be ignited in everyone.
+
+                    Created by Bahrainis for Bahrainis — and for anyone else who wants to contribute to this beautiful island — Estejeb is a platform designed to bring these desires to life. It’s where organizations in need of volunteers connect with individuals who are ready to make an impact.
+
+                    Through Estejeb, we’re giving you the opportunity to finally take that step and be part of something that truly matters. Whether you're an organization looking to bring volunteers on board, or someone looking to contribute their time and skills, Estejeb is the place to turn intentions into action.
+
+                    Together, we’re not just building a platform — we’re building a community. A community where the spirit of volunteerism and the passion to make a difference come together. This is more than a website; it’s a movement to empower everyone to make real change.
+
+                    Let’s create the Bahrain — and the world — we all envision, one opportunity at a time.
+                </p>
+            </div>
+        </div>
+    </section>
+{% endblock %}

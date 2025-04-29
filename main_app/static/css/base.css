@@ -1,0 +1,92 @@
+/* main_app/static/css/base.css */
+
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #fff;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+a {
+    text-decoration: none;
+    color: #006f4f;
+}
+
+a:hover {
+    color: #ffcb00;
+}
+
+/* Header Styles */
+header {
+    background-color: #006f4f;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+header .header-logo-container img {
+    width: 150px;
+}
+
+nav {
+    margin-top: 20px;
+}
+
+nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+}
+
+nav ul li {
+    display: inline;
+}
+
+nav ul li a {
+    font-size: 18px;
+    color: white;
+    font-weight: bold;
+}
+
+nav ul li a:hover {
+    color: #ffcb00;
+}
+
+/* Main Content */
+main {
+    padding: 30px;
+    background-color: #f7f7f7;
+}
+
+/* Footer Styles */
+footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+}
+
+footer p {
+    margin: 0;
+}
+
+/* Button Styles */
+button {
+    background-color: #ff5722;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #f44336;
+}

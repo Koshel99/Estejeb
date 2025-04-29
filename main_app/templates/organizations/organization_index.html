@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% comment %} main_app/templates/organizations/organization_index.html {% endcomment %}
+
+
+{% block content %}
+    <h1>All Organizations</h1>
+    <ul>
+    {% for organization in organizations %}
+        <li>
+        <a href="{% url 'organization-profile' organization.id %}">
+            {{ organization.name }}
+        </a>
+        </li>
+    {% endfor %}
+    </ul>
+{% endblock %}

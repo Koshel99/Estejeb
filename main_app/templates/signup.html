@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% comment %} main_app/templates/signup.html {% endcomment %}
+
+
+{% block content %}
+  <h1>Sign Up</h1>
+
+  <!-- Display error message if there is one -->
+  {% if error_message %}
+    <p class="error">{{ error_message }}</p>
+  {% endif %}
+
+  <!-- Sign Up Form -->
+  <form method="post">
+    {% csrf_token %}
+
+    <!-- Checkbox to toggle organization signup -->
+    <label>
+      <input type="checkbox" name="organization" id="org-check" />
+      Sign up as an Organization
+    </label>
+
+    <!-- User form -->
+    <div>
+      {{ user_form.as_p }}
+    </div>
+
+    <!-- Organization form, hidden by default -->
+    <div id="org-form" style="display: none;">
+      {{ organization_form.as_p }}
+    </div>
+
+    <button type="submit">Sign Up</button>
+  </form>
+
+  <!-- JavaScript to toggle visibility of the organization form -->
+  <script>
+    const checkbox = document.getElementById('org-check');
+    const orgForm = document.getElementById('org-form');
+
+    checkbox.addEventListener('change', function () {
+      orgForm.style.display = this.checked ? 'block' : 'none';
+    });
+  </script>
+
+{% endblock %}
