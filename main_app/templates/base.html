@@ -22,17 +22,34 @@
       </div>
       <nav>
         <ul>
-          {% if user.is_authenticated %}
-            <li><a href="{% url 'home' %}">Home</a></li>
-            <li><a href="{% url 'about' %}">About</a></li>
-            <li><a href="{% url 'organization-create' %}">Create Organization</a></li>
-            <li><a href="{% url 'logout' %}">Logout</a></li>
-          {% else %}
-            <li><a href="{% url 'about' %}">About</a></li>
-            <li><a href="{% url 'login' %}">Login</a></li>
-            <li><a href="{% url 'signup' %}">Sign Up</a></li>
-          {% endif %}
-        </ul>
+  {% if user.is_authenticated %}
+    <li><a href="{% url 'home' %}">Home</a></li>
+    <li><a href="{% url 'about' %}">About</a></li>
+
+    {% if user.is_superuser %}
+      <li><a href="{% url 'organization-create' %}">Create Organization</a></li>
+      <li><a href="{% url 'volunteer-profile-create' %}">Create Volunteer</a></li>
+
+    {% elif user.organization %}
+      <li><a href="{% url 'organization-profile' user.organization.id %}">My Organization</a></li>
+      <li><a href="{% url 'opportunity-create' %}">Create Cause</a></li>
+      <li><a href="{% url 'opportunity-list' %}">View Causes</a></li>
+      <li><a href="{% url 'organization-list' %}">All Organizations</a></li>
+
+    {% elif user.volunteerprofile %}
+      <li><a href="{% url 'volunteer-profile' user.volunteerprofile.id %}">My Profile</a></li>
+      <li><a href="{% url 'opportunity-list' %}">Browse Causes</a></li>
+      <li><a href="{% url 'organization-list' %}">All Organizations</a></li>
+    {% endif %}
+
+    <li><a href="{% url 'logout' %}">Logout</a></li>
+  {% else %}
+    <li><a href="{% url 'about' %}">About</a></li>
+    <li><a href="{% url 'login' %}">Login</a></li>
+    <li><a href="{% url 'signup' %}">Sign Up</a></li>
+  {% endif %}
+</ul>
+
       </nav>
     </header>
 

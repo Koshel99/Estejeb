@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% comment %} main_app/templates/opportunities/applicants_list.html {% endcomment %}
+
+{% block content %}
+  <h1>Applicants for "{{ opportunity.title }}"</h1>
+
+  {% if applications %}
+    <ul>
+      {% for application in applications %}
+        <li>
+          <strong>{{ application.volunteer.user.username }}</strong><br>
+          {% if application.volunteer.bio %}
+            Bio: {{ application.volunteer.bio }}<br>
+          {% endif %}
+          {% if application.volunteer.skills %}
+            Skills: {{ application.volunteer.skills }}
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No volunteers have applied yet.</p>
+  {% endif %}
+
+  <a href="{% url 'opportunity-detail' opportunity.id %}">← Back to Opportunity</a>
+{% endblock %}

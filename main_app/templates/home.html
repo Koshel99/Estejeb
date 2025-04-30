@@ -1,16 +1,43 @@
 {% extends 'base.html' %}
 
+{% comment %} main_app/templates/home.html {% endcomment %}
+
 {% block content %}
-    <h1>All Organizations</h1>
-    <ul>
-    {% for organization in organizations %}
-        <li>
-        <a href="{% url 'organization-profile' organization.id %}">
+  <div class="page-header">
+    <h1>Newly Joined Organizations</h1>
+  </div>
+
+  {% if organizations %}
+    <ul class="organization-list">
+      {% for organization in organizations %}
+        <li class="organization-item">
+          <a href="{% url 'organization-profile' organization.id %}">
             {{ organization.name }}
-        </a>
+          </a>
         </li>
-    {% empty %}
-        <li>No organizations available.</li>
-    {% endfor %}
+      {% endfor %}
     </ul>
+  {% else %}
+    <p>No organizations available.</p>
+  {% endif %}
+
+  <div class="page-header">
+    <h1>Latest Volunteer Opportunities</h1>
+  </div>
+
+  {% if opportunities %}
+    <ul class="opportunity-list">
+      {% for opportunity in opportunities %}
+        <li class="opportunity-item">
+          <a href="{% url 'opportunity-detail' opportunity.id %}">
+            {{ opportunity.title }} - {{ opportunity.location }}
+          </a>
+          ({{ opportunity.num_volunteers_needed }} volunteers needed)
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No volunteer opportunities available.</p>
+  {% endif %}
 {% endblock %}
+

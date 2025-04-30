@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% comment %} main_app/templates/opportunities/opportunity_list.html {% endcomment %}
+
+{% block content %}
+  <h1>Available Opportunities</h1>
+
+  <div class="opportunity-list">
+    {% for opportunity in opportunities %}
+      <div class="opportunity-card">
+        <h2>{{ opportunity.title }}</h2>
+        <p><strong>Location:</strong> {{ opportunity.location }}</p>
+        <p><strong>Age Requirement:</strong> {{ opportunity.age_requirement }}+</p>
+        <p><strong>Volunteers Needed:</strong> {{ opportunity.num_volunteers_needed }}</p>
+        <p><strong>Description:</strong> {{ opportunity.description|truncatewords:30 }}</p>
+        <a href="{% url 'opportunity-detail' opportunity.id %}">Read More</a>
+        
+        {% if user.is_authenticated %}
+          {% if user == opportunity.organization.user %}
+            <!-- If the user is the organization owner, they can manage the opportunity -->
+            <div class="opportunity-actions">
+              <a href="{% url 'opportunity-edit' opportunity.id %}">Edit</a> |
+              <a href="{% url 'opportunity-delete' opportunity.id %}">Delete</a>
+            </div>
+          {% elif user.volunteerprofile %}
+            <!-- If the user is a volunteer, they can apply to the opportunity -->
+            <form method="post" action="{% url 'apply-opportunity' opportunity.id %}">
+              {% csrf_token %}
+              <button type="submit">Apply</button>
+            </form>
+          {% endif %}
+        {% else %}
+          <p><a href="{% url 'login' %}">Log in</a> to apply or manage opportunities.</p>
+        {% endif %}
+      </div>
+    {% empty %}
+      <p>No opportunities available at the moment.</p>
+    {% endfor %}
+  </div>
+
+  <br><a href="{% url 'home' %}">← Back to Home</a>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% comment %} main_app/templates/organizations/organization_list.html {% endcomment %}
+
+{% block content %}
+  <h1>All Organizations</h1>
+
+  {% if organizations %}
+    <ul>
+      {% for organization in organizations %}
+        <li>
+          <a href="{% url 'organization-profile' organization.id %}">
+            {{ organization.name }}
+          </a> — {{ organization.location }}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No organizations found.</p>
+  {% endif %}
+{% endblock %}

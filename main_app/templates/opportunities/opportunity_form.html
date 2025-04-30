@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% comment %} main_app/templates/opportunities/opportunity_form.html {% endcomment %}
+
+{% block content %}
+  <h2>Edit Opportunity</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Save Changes</button>
+  </form>
+{% endblock %}

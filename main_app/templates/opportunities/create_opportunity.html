@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% comment %} main_app/templates/opportunities/create_opportunity.html {% endcomment %}
+
+{% block content %}
+  <h1>Create Opportunity</h1>
+
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Save</button>
+  </form>
+
+  <a href="{% url 'home' %}">← Back to Home</a>
+{% endblock %}

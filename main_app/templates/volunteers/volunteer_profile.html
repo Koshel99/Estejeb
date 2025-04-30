@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% comment %} main_app/templates/volunteers/volunteer_profile.html {% endcomment %}
+
+{% block content %}
+  <div class="page-header">
+    <h1>{{ volunteer_profile.user.username }}'s Volunteer Profile</h1>
+  </div>
+
+  <div class="profile-info">
+    <h2>Personal Information</h2>
+    <p><strong>Name:</strong> {{ volunteer_profile.user.first_name }} {{ volunteer_profile.user.last_name }}</p>
+    <p><strong>Email:</strong> {{ volunteer_profile.user.email }}</p>
+
+    {% if volunteer_profile.bio %}
+      <p><strong>Bio:</strong> {{ volunteer_profile.bio }}</p>
+    {% else %}
+      <p><strong>Bio:</strong> Not provided</p>
+    {% endif %}
+  </div>
+
+  <div class="profile-opportunities">
+    <h2>Applied Opportunities</h2>
+    {% if volunteer_profile.applications.exists %}
+      <ul>
+        {% for application in volunteer_profile.applications.all %}
+          <li>
+            <a href="{% url 'opportunity-detail' application.opportunity.id %}">
+              {{ application.opportunity.title }} at {{ application.opportunity.organization.name }}
+            </a> - Status: {{ application.status }}
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>You have not applied to any opportunities yet.</p>
+    {% endif %}
+  </div>
+
+  <div class="profile-actions">
+    <a href="{% url 'volunteer-edit' volunteer_profile.id %}" class="btn btn-edit">Edit Profile</a>
+    <a href="{% url 'home' %}" class="btn btn-back">Back to Home</a>
+  </div>
+
+{% endblock %}

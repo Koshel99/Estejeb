@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% comment %} main_app/templates/opportunities/opportunity_confirm_delete.html {% endcomment %}
+
+{% block content %}
+  <h2>Delete Opportunity</h2>
+  <p>Are you sure you want to delete "{{ object }}"?</p>
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit">Yes, Delete</button>
+    <a href="{% url 'opportunity-detail' object.id %}">Cancel</a>
+  </form>
+{% endblock %}

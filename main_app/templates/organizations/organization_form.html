@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% comment %} main_app/templates/organizations/organization_form.html {% endcomment %}
+
+{% block content %}
+  <h2>Create/Edit Organization</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Save Organization</button>
+  </form>
+{% endblock %}
