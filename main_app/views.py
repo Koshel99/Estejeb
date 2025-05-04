@@ -91,7 +91,8 @@ def create_organization(request):
             return redirect('organization-detail', pk=organization.pk)
     else:
         form = OrganizationForm()
-
+        
+        
     return render(request, 'organizations/organization_form.html', {'form': form})
 
 class OrganizationCreate(CreateView):
