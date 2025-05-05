@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% comment %} main_app/templates/opportunities/thank_you_for_applying.html {% endcomment %}
+
+{% block content %}
+  <div class="alert alert-success">
+    <h2>Thank you for applying!</h2>
+    <p>Your application has been successfully submitted. Please check your profile or explore other opportunities.</p>
+  </div>
+  <a href="{% url 'opportunity-list' %}">Back to Opportunities</a>
+{% endblock %}

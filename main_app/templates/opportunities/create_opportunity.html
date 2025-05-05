@@ -8,8 +8,8 @@
   <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit">Save</button>
+    <button type="submit">Create Opportunity</button>
   </form>
-
-  <a href="{% url 'home' %}">← Back to Home</a>
+  
+  <br><a href="{% url 'opportunity-list' %}">← Back to Opportunity List</a>
 {% endblock %}

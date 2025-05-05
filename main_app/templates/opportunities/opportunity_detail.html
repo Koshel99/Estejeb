@@ -14,15 +14,31 @@
     <p><strong>Certifications Required:</strong> {{ opportunity.certifications_list }}</p>
   {% endif %}
 
+  <p><strong>Organization:</strong> {{ opportunity.organization.name }}</p>
+
+  {% if is_filled %}
+    <p><strong>Status:</strong> This opportunity is full.</p>
+  {% else %}
+    <p><strong>Status:</strong> Active</p>
+  {% endif %}
+
   {% if user.is_authenticated %}
     {% if user == opportunity.organization.user %}
-      <!-- If the user is the owner of the organization -->
       <a href="{% url 'applicants-list' opportunity.id %}">View Applicants</a>
+
+      {% if not is_filled %}
+        <form method="post" action="{% url 'mark-as-filled' opportunity.id %}">
+          {% csrf_token %}
+          <button type="submit">Mark Opportunity as Filled</button>
+        </form>
+      {% else %}
+        <p>This opportunity is filled and no further applications are allowed.</p>
+      {% endif %}
+
     {% elif user.volunteerprofile %}
-      <!-- If the user is a volunteer -->
       <form method="post" action="{% url 'apply-opportunity' opportunity.id %}">
         {% csrf_token %}
-        <button type="submit">Apply to This Opportunity</button>
+        <button type="submit" {% if is_filled %} disabled {% endif %}>Apply to This Opportunity</button>
       </form>
     {% endif %}
   {% else %}

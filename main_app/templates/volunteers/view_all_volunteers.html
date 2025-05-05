@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% comment %} main_app/templates/volunteers/view_all_volunteers.html {% endcomment %}
+
+{% block content %}
+  <h1>All Volunteers</h1>
+
+  {% if volunteers %}
+    <ul>
+      {% for volunteer in volunteers %}
+        <li>
+          <a href="{% url 'volunteer-profile' volunteer.id %}">
+            {{ volunteer.user.username }}
+          </a> — Age: {{ volunteer.age }} — Bio: {{ volunteer.bio }}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No volunteers found.</p>
+  {% endif %}
+{% endblock %}

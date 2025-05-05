@@ -14,10 +14,8 @@
           <p><strong>Location:</strong> {{ organization.location }}</p>
           <p><strong>Website:</strong> <a href="{{ organization.website }}" target="_blank">{{ organization.website }}</a></p>
 
-          <!-- Link to organization profile page -->
           <a href="{% url 'organization-profile' organization.id %}">View Details</a>
 
-          <!-- Conditional link for authenticated users to create a cause (opportunity) if they belong to the organization -->
           {% if user.is_authenticated %}
             <a href="{% url 'create-opportunity' organization.id %}">Create Cause (Opportunity)</a>
           {% endif %}

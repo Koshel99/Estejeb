@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% comment %} main_app/templates/volunteers/volunteer_profile.html {% endcomment %}
+{% comment %} templates/volunteers/volunteer_profile.html {% endcomment %}
 
 {% block content %}
   <div class="page-header">
@@ -15,6 +15,24 @@
       <p><strong>Bio:</strong> {{ volunteer_profile.bio }}</p>
     {% else %}
       <p><strong>Bio:</strong> Not provided</p>
+    {% endif %}
+  </div>
+
+  <div class="profile-photo">
+    <h2>Profile Picture</h2>
+    {% if volunteer_profile.photo %}
+      <img src="{{ volunteer_profile.photo.url }}" alt="Profile Picture" class="profile-pic" />
+    {% else %}
+      <p>No profile picture uploaded.</p>
+    {% endif %}
+  </div>
+
+  <div class="profile-resume">
+    <h2>Resume</h2>
+    {% if volunteer_profile.resume %}
+      <a href="{{ volunteer_profile.resume.url }}" target="_blank">Download Resume</a>
+    {% else %}
+      <p>No resume uploaded.</p>
     {% endif %}
   </div>
 
@@ -36,8 +54,13 @@
   </div>
 
   <div class="profile-actions">
-    <a href="{% url 'volunteer-edit' volunteer_profile.id %}" class="btn btn-edit">Edit Profile</a>
+    {% if request.user == volunteer_profile.user %}
+      <a href="{% url 'volunteer-edit' volunteer_profile.id %}" class="btn btn-edit">Edit Profile</a>
+      <form action="{% url 'volunteer-delete' volunteer_profile.id %}" method="post" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-delete" onclick="return confirm('Are you sure you want to delete your profile? This cannot be undone.')">Delete Profile</button>
+      </form>
+    {% endif %}
     <a href="{% url 'home' %}" class="btn btn-back">Back to Home</a>
   </div>
-
 {% endblock %}

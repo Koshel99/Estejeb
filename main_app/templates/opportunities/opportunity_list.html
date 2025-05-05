@@ -14,16 +14,14 @@
         <p><strong>Volunteers Needed:</strong> {{ opportunity.num_volunteers_needed }}</p>
         <p><strong>Description:</strong> {{ opportunity.description|truncatewords:30 }}</p>
         <a href="{% url 'opportunity-detail' opportunity.id %}">Read More</a>
-        
+
         {% if user.is_authenticated %}
-          {% if user == opportunity.organization.user %}
-            <!-- If the user is the organization owner, they can manage the opportunity -->
+          {% if user.organizationprofile %}
             <div class="opportunity-actions">
               <a href="{% url 'opportunity-edit' opportunity.id %}">Edit</a> |
               <a href="{% url 'opportunity-delete' opportunity.id %}">Delete</a>
             </div>
           {% elif user.volunteerprofile %}
-            <!-- If the user is a volunteer, they can apply to the opportunity -->
             <form method="post" action="{% url 'apply-opportunity' opportunity.id %}">
               {% csrf_token %}
               <button type="submit">Apply</button>

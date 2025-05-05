@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+<!-- main_app/templates/volunteers/volunteer_profile_form.html -->
+
+{% block content %}
+  <h2>Create Volunteer Profile</h2>
+  <form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    
+    <div>
+      <label for="{{ form.resume.id_for_label }}">Resume</label>
+      {{ form.resume }}
+    </div>
+    
+    <div>
+      <label for="{{ form.qualifications.id_for_label }}">Qualifications</label>
+      {{ form.qualifications }}
+    </div>
+
+    <div>
+      <label for="{{ form.photo.id_for_label }}">Photo</label>
+      {{ form.photo }}
+    </div>
+
+    <div>
+      <label for="{{ form.interests.id_for_label }}">Interests</label>
+      {{ form.interests }}
+    </div>
+
+    <button type="submit">Save Profile</button>
+  </form>
+{% endblock %}
+{% comment %} main_app/templates/volunteers/volunteer_profile_form.html {% endcomment %}

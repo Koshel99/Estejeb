@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% comment %} main_app/templates/opportunities/already_applied.html {% endcomment %}
+
+{% block content %}
+  <div class="alert alert-info">
+    <h2>You have already applied for this opportunity!</h2>
+    <p>Thank you for your interest. Please check your profile or other opportunities.</p>
+  </div>
+  <a href="{% url 'opportunity-list' %}">Back to Opportunities</a>
+{% endblock %}

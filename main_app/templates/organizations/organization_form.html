@@ -1,12 +1,30 @@
 {% extends 'base.html' %}
 
-{% comment %} main_app/templates/organizations/organization_form.html {% endcomment %}
+{% comment %} main_app/templates/organizations/organization_index.html {% endcomment %}
 
 {% block content %}
-  <h2>Create/Edit Organization</h2>
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Save Organization</button>
-  </form>
+  <h1>All Organizations</h1>
+
+  {% if organizations %}
+    <div class="organization-list">
+      {% for organization in organizations %}
+        <div class="organization-card">
+          <h3>{{ organization.name }}</h3>
+          <p><strong>Description:</strong> {{ organization.description|truncatewords:20 }}</p>
+          <p><strong>Location:</strong> {{ organization.location }}</p>
+          <p><strong>Website:</strong> <a href="{{ organization.website }}" target="_blank">{{ organization.website }}</a></p>
+
+          <a href="{% url 'organization-profile' organization.id %}">View Details</a>
+
+          {% if user.is_authenticated %}
+            <a href="{% url 'create-opportunity' organization.id %}">Create Cause (Opportunity)</a>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>No organizations available at the moment.</p>
+  {% endif %}
+
+  <br><a href="{% url 'home' %}">← Back to Home</a>
 {% endblock %}

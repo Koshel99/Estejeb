@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% comment %} templates/volunteers/volunteer_edit.html {% endcomment %}
+
+{% block content %}
+  <h1>Edit Volunteer Profile</h1>
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    
+    <div>
+      <label for="first_name">First Name</label>
+      <input type="text" name="first_name" value="{{ volunteer_profile.user.first_name }}" />
+    </div>
+
+    <div>
+      <label for="last_name">Last Name</label>
+      <input type="text" name="last_name" value="{{ volunteer_profile.user.last_name }}" />
+    </div>
+
+    <div>
+      <label for="email">Email</label>
+      <input type="email" name="email" value="{{ volunteer_profile.user.email }}" />
+    </div>
+
+    <!-- Profile Picture -->
+    <div>
+      <label for="photo">Profile Picture</label>
+      <input type="file" name="photo" />
+      {% if volunteer_profile.photo %}
+        <p>Current Profile Picture: <img src="{{ volunteer_profile.photo.url }}" alt="Profile Picture" width="100" /></p>
+      {% endif %}
+    </div>
+
+    <!-- Resume -->
+    <div>
+      <label for="resume">Resume</label>
+      <input type="file" name="resume" />
+      {% if volunteer_profile.resume %}
+        <p>Current Resume: <a href="{{ volunteer_profile.resume.url }}" target="_blank">Download</a></p>
+      {% endif %}
+    </div>
+
+    <div>
+      <label for="qualifications">Qualifications</label>
+      <textarea name="qualifications">{{ volunteer_profile.qualifications }}</textarea>
+    </div>
+
+    <div>
+      <label for="interests">Interests</label>
+      <textarea name="interests">{{ volunteer_profile.interests }}</textarea>
+    </div>
+
+    <button type="submit">Save Changes</button>
+  </form>
+
+  <a href="{% url 'volunteer-profile' volunteer_profile.id %}">Back to Profile</a>
+{% endblock %}
