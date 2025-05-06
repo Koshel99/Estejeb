@@ -21,8 +21,8 @@ urlpatterns = [
     path('organizations/create/', views.create_organization, name='organization-create'),
     path('organizations/<int:pk>/edit/', views.OrganizationUpdate.as_view(), name='organization-edit'),
     path('organizations/<int:pk>/delete/', views.OrganizationDelete.as_view(), name='organization-delete'),
-    path('opportunities/<int:id>/apply/', views.apply_to_opportunity, name='apply-to-opportunity'),
-    path('opportunity/<int:opportunity_id>/thank-you/', views.thank_you_for_applying, name='thank-you-for-applying'),
+    path('opportunities/<int:opportunity_id>/thank-you/', views.thank_you_for_applying, name='thank-you-for-applying'),
+
 
     # Volunteer
     path('volunteer/profile/<int:id>/', views.volunteer_profile, name='volunteer-profile'),

@@ -23,7 +23,7 @@
   {% endif %}
 
   {% if user.is_authenticated %}
-    {% if user == opportunity.organization.user %}
+    {% if user == opportunity.organization.user or user.is_superuser %}
       <a href="{% url 'applicants-list' opportunity.id %}">View Applicants</a>
 
       {% if not is_filled %}
@@ -35,6 +35,11 @@
         <p>This opportunity is filled and no further applications are allowed.</p>
       {% endif %}
 
+      <a href="{% url 'opportunity-edit' opportunity.id %}">Edit</a>
+      <form method="post" action="{% url 'opportunity-delete' opportunity.id %}" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit" onclick="return confirm('Are you sure you want to delete this opportunity?');">Delete</button>
+      </form>
     {% elif user.volunteerprofile %}
       <form method="post" action="{% url 'apply-opportunity' opportunity.id %}">
         {% csrf_token %}

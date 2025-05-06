@@ -29,7 +29,7 @@ def about(request):
 def profile(request):
     return  render(request, 'home.html')
 
-# Define the admin function
+# Define the signup view function
 def signup(request):
     if request.method == 'POST':
         user_form = UserCreationForm(request.POST)
@@ -37,18 +37,14 @@ def signup(request):
         volunteer_form = VolunteerProfileForm(request.POST)
 
         if user_form.is_valid():
-            user = user_form.save()
-            user.refresh_from_db()
+            user = user_form.save(commit=False)  # Don't save yet so we can attach the right profile
+            user.save()
 
             if 'organization' in request.POST:
                 if organization_form.is_valid():
                     organization = organization_form.save(commit=False)
                     organization.user = user
                     organization.save()
-
-                    user.organization = organization
-                    user.save()
-
             else:
                 if volunteer_form.is_valid():
                     volunteer_profile = volunteer_form.save(commit=False)
@@ -57,7 +53,7 @@ def signup(request):
 
             login(request, user)
             return redirect('home')
-
+        # else: one or more forms were invalid
     else:
         user_form = UserCreationForm()
         organization_form = OrganizationForm()
@@ -68,6 +64,7 @@ def signup(request):
         'organization_form': organization_form,
         'volunteer_form': volunteer_form
     })
+
 
 
 # Define the organization function
@@ -118,6 +115,22 @@ class OrganizationDelete(DeleteView):
     template_name = 'organizations/organization_confirm_delete.html'
     success_url = reverse_lazy('home')
     
+@login_required
+def organization_details(request, id):
+    organization = get_object_or_404(Organization, id=id)
+    is_owner_or_superuser = (organization.user == request.user or request.user.is_superuser)
+    
+    opportunities = organization.opportunity_set.all()
+    
+    return render(
+        request,
+        'organizations/organization_details.html',
+        {
+            'organization': organization,
+            'is_owner_or_superuser': is_owner_or_superuser,
+            'opportunities': opportunities,
+        }
+    )
 # Volunteer:
 
 @login_required
@@ -208,7 +221,7 @@ def create_opportunity(request):
                 opportunity.organization = request.user.organization
             else:
                 return redirect('organization-list')
-            
+
             opportunity.save()
             return redirect('opportunity-list')
         else:
@@ -217,7 +230,6 @@ def create_opportunity(request):
         form = OpportunityForm(user=request.user)
 
     return render(request, 'opportunities/create_opportunity.html', {'form': form})
-
 
 def opportunity_detail(request, id):
     opportunity = get_object_or_404(Opportunity, id=id)
@@ -231,22 +243,71 @@ def opportunity_detail(request, id):
         'opportunity': opportunity,
         'is_full': is_full,
     })
+    
+def opportunity_update(request, pk):
+    opportunity = get_object_or_404(Opportunity, pk=pk)
 
+    if request.user == opportunity.organization.user or request.user.is_superuser:
+        if request.method == 'POST':
+            form = OpportunityForm(request.POST, instance=opportunity)
+            if form.is_valid():
+                form.save()
+                return redirect('opportunity-detail', pk=opportunity.pk)
+        else:
+            form = OpportunityForm(instance=opportunity)
+
+        return render(request, 'opportunities/opportunity_update.html', {'form': form})
+
+    return redirect('home')
+
+
+def opportunity_delete(request, pk):
+    opportunity = get_object_or_404(Opportunity, pk=pk)
+
+    if request.user == opportunity.organization.user or request.user.is_superuser:
+        opportunity.delete()
+        return redirect('home')
+
+    return redirect('home')
+
+class OpportunityUpdate(UpdateView):
+    model = Opportunity
+    form_class = OpportunityForm
+    template_name = 'opportunities/opportunity_form.html'
+    success_url = reverse_lazy('opportunity-list')
+
+    def dispatch(self, request, *args, **kwargs):
+        opportunity = self.get_object()
+        if request.user != opportunity.organization.user and not request.user.is_superuser:
+            return redirect('home')
+        return super().dispatch(request, *args, **kwargs)
+    
+class OpportunityDelete(DeleteView):
+    model = Opportunity
+    template_name = 'opportunities/opportunity_confirm_delete.html'
+    success_url = reverse_lazy('opportunity-list')
+
+    def dispatch(self, request, *args, **kwargs):
+        opportunity = self.get_object()
+        if request.user != opportunity.organization.user and not request.user.is_superuser:
+            return redirect('home')
+        return super().dispatch(request, *args, **kwargs)
     
 @login_required
 def apply_to_opportunity(request, id):
     opportunity = get_object_or_404(Opportunity, id=id)
 
-    volunteer_profile = get_object_or_404(VolunteerProfile, user=request.user)
+    volunteer_profile = VolunteerProfile.objects.filter(user=request.user).first()
+
+    if not volunteer_profile:
+        return redirect('create_volunteer_profile')
 
     if Application.objects.filter(volunteer=volunteer_profile, opportunity=opportunity).exists():
         return render(request, 'opportunities/already_applied.html')
 
-    if request.method == 'POST':
-        Application.objects.create(volunteer=volunteer_profile, opportunity=opportunity)
-        return render(request, 'opportunities/thank_you_for_applying.html')
+    Application.objects.create(volunteer=volunteer_profile, opportunity=opportunity)
 
-    return redirect('opportunity-detail', id=opportunity.id)
+    return redirect('thank-you-for-applying', opportunity_id=id)
 
 @login_required
 def mark_as_filled(request, id):

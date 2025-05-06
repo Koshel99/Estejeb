@@ -1,45 +1,61 @@
 {% extends 'base.html' %}
+
 {% comment %} main_app/templates/signup.html {% endcomment %}
 
 {% block content %}
   <h1>Sign Up</h1>
 
-  <!-- Display error message if there is one -->
   {% if error_message %}
     <p class="error">{{ error_message }}</p>
   {% endif %}
 
-  <!-- Sign Up Form -->
-  <form method="post">
+  <form method="post" novalidate>
     {% csrf_token %}
 
-    <!-- Checkbox to toggle organization signup -->
     <label>
       <input type="checkbox" name="organization" id="org-check" />
       Sign up as an Organization
     </label>
 
-    <!-- User form -->
     <div>
       {{ user_form.as_p }}
     </div>
 
-    <!-- Organization form, hidden by default -->
     <div id="org-form" style="display: none;">
       {{ organization_form.as_p }}
+    </div>
+
+    <div id="volunteer-form">
+      {{ volunteer_form.as_p }}
     </div>
 
     <button type="submit">Sign Up</button>
   </form>
 
-  <!-- JavaScript to toggle visibility of the organization form -->
   <script>
     const checkbox = document.getElementById('org-check');
     const orgForm = document.getElementById('org-form');
+    const volunteerForm = document.getElementById('volunteer-form');
 
-    checkbox.addEventListener('change', function () {
-      orgForm.style.display = this.checked ? 'block' : 'none';
-    });
+    function toggleForms() {
+      if (checkbox.checked) {
+        orgForm.style.display = 'block';
+        volunteerForm.style.display = 'none';
+
+        // Disable volunteer fields, enable org fields
+        volunteerForm.querySelectorAll('input, select, textarea').forEach(el => el.disabled = true);
+        orgForm.querySelectorAll('input, select, textarea').forEach(el => el.disabled = false);
+      } else {
+        orgForm.style.display = 'none';
+        volunteerForm.style.display = 'block';
+
+        // Disable org fields, enable volunteer fields
+        orgForm.querySelectorAll('input, select, textarea').forEach(el => el.disabled = true);
+        volunteerForm.querySelectorAll('input, select, textarea').forEach(el => el.disabled = false);
+      }
+    }
+
+    checkbox.addEventListener('change', toggleForms);
+    window.addEventListener('load', toggleForms);
   </script>
-
 {% endblock %}

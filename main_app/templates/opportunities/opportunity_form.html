@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
 
-{% comment %} main_app/templates/opportunities/opportunity_form.html {% endcomment %}
+{% comment %} main_app/templates/organizations/organization_form.html {% endcomment %}
 
 {% block content %}
-  <h2>Edit Opportunity</h2>
+  <h2>Create Organization</h2>
   <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
@@ -20,6 +20,6 @@
       </div>
     {% endif %}
     
-    <button type="submit">Save Changes</button>
+    <button type="submit">Create Organization</button>
   </form>
 {% endblock %}

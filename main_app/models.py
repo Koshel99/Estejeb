@@ -29,6 +29,10 @@ class Opportunity(models.Model):
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
     is_filled = models.BooleanField(default=False)
     
+    def is_organization(self):
+        return hasattr(self, 'organization')
+    
+    
     @property
     def is_filled(self):
         return getattr(self, '_is_filled', False)
@@ -59,11 +63,14 @@ class VolunteerProfile(models.Model):
 
     def __str__(self):
         return self.user.username
+    
+    def is_volunteer(self):
+        return hasattr(self, 'volunteerprofile')
 
 class Application(models.Model):
     opportunity = models.ForeignKey('Opportunity', on_delete=models.CASCADE, related_name='applications')
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_applications', default=1)  # default=1 refers to a User with ID=1
-    volunteer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='volunteer_applications', default=1)  # Similar here
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_applications', default=1)
+    volunteer = models.ForeignKey(VolunteerProfile, on_delete=models.CASCADE, related_name='volunteer_applications', default=1)
 
     def __str__(self):
-        return f"Application for {self.opportunity.title} by {self.user.username}"
+        return f"Application for {self.opportunity.title} by {self.volunteer.user.username}"
