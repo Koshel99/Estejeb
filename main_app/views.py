@@ -3,16 +3,18 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
-from .models import Organization, Opportunity, VolunteerProfile, Application
-from .forms import OrganizationForm, VolunteerProfileForm, OpportunityForm
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.core.mail import send_mail
 from django.conf import settings
+from django.contrib import messages
 
-# Define the home view function
+from .models import Organization, Opportunity, VolunteerProfile, Application
+from .forms import OrganizationForm, VolunteerProfileForm, OpportunityForm
+
+# Home Page View
 def home(request):
     organizations = Organization.objects.all().order_by('-id')[:4]
     opportunities = Opportunity.objects.all().order_by('-id')[:4]
@@ -21,15 +23,15 @@ def home(request):
         'opportunities': opportunities
     })
 
-# Define the about view function
+# About Page View
 def about(request):
     return render(request, 'about.html')
 
-# admin
+# Admin Profile Page View (Currently redirecting to home)
 def profile(request):
-    return  render(request, 'home.html')
+    return render(request, 'home.html')
 
-# Define the signup view function
+# Signup View
 def signup(request):
     if request.method == 'POST':
         user_form = UserCreationForm(request.POST)
@@ -37,7 +39,7 @@ def signup(request):
         volunteer_form = VolunteerProfileForm(request.POST)
 
         if user_form.is_valid():
-            user = user_form.save(commit=False)  # Don't save yet so we can attach the right profile
+            user = user_form.save(commit=False)
             user.save()
 
             if 'organization' in request.POST:
@@ -53,7 +55,6 @@ def signup(request):
 
             login(request, user)
             return redirect('home')
-        # else: one or more forms were invalid
     else:
         user_form = UserCreationForm()
         organization_form = OrganizationForm()
@@ -65,22 +66,22 @@ def signup(request):
         'volunteer_form': volunteer_form
     })
 
-
-
-# Define the organization function
+# Organization Profile View
 @login_required
-def organization_profile(request, id):
-    company_profile = get_object_or_404(Organization, id=id)
-    opportunities = Opportunity.objects.filter(organization=company_profile, is_active=True)
+def organization_profile(request, pk):
+    organization = get_object_or_404(Organization, pk=pk)
+    opportunities = Opportunity.objects.filter(organization=organization, is_active=True)
     return render(request, 'organizations/organization_profile.html', {
-        'company_profile': company_profile,
+        'organization': organization,
         'opportunities': opportunities
     })
 
+# Organization List View
 def organization_list(request):
-    organizations = Organization.objects.all()  # Fetch all organizations
+    organizations = Organization.objects.all()
     return render(request, 'organizations/organization_list.html', {'organizations': organizations})
 
+# Create Organization View
 @login_required
 def create_organization(request):
     if request.method == 'POST':
@@ -92,12 +93,13 @@ def create_organization(request):
 
             return redirect('organization-profile', id=organization.id)
         else:
-            print(form.errors)
+            messages.error(request, 'There was an error in your form. Please check the fields and try again.')
     else:
         form = OrganizationForm()
 
     return render(request, 'organizations/organization_form.html', {'form': form})
 
+# Organization CRUD Views
 class OrganizationCreate(CreateView):
     model = Organization
     fields = ['name', 'description', 'location', 'website']
@@ -114,38 +116,35 @@ class OrganizationDelete(DeleteView):
     model = Organization
     template_name = 'organizations/organization_confirm_delete.html'
     success_url = reverse_lazy('home')
-    
+
+# Organization Details View (For admins and owners)
 @login_required
 def organization_details(request, id):
     organization = get_object_or_404(Organization, id=id)
     is_owner_or_superuser = (organization.user == request.user or request.user.is_superuser)
-    
     opportunities = organization.opportunity_set.all()
-    
-    return render(
-        request,
-        'organizations/organization_details.html',
-        {
-            'organization': organization,
-            'is_owner_or_superuser': is_owner_or_superuser,
-            'opportunities': opportunities,
-        }
-    )
-# Volunteer:
 
+    return render(request, 'organizations/organization_details.html', {
+        'organization': organization,
+        'is_owner_or_superuser': is_owner_or_superuser,
+        'opportunities': opportunities,
+    })
+
+# Volunteer Profile View
 @login_required
-def volunteer_profile(request, id):
-    volunteer_profile = get_object_or_404(VolunteerProfile, id=id)
-
+def volunteer_profile(request, pk):
+    volunteer_profile = get_object_or_404(VolunteerProfile, pk=pk)
+    
     return render(request, 'volunteers/volunteer_profile.html', {
         'volunteer_profile': volunteer_profile
     })
 
+# View All Volunteers
 def view_all_volunteers(request):
-    # Fetch all volunteer profiles
     volunteers = VolunteerProfile.objects.all()
     return render(request, 'volunteers/view_all_volunteers.html', {'volunteers': volunteers})
 
+# Edit Volunteer Profile
 @login_required
 def volunteer_edit(request, id):
     volunteer_profile = get_object_or_404(VolunteerProfile, id=id)
@@ -162,15 +161,13 @@ def volunteer_edit(request, id):
         form = VolunteerProfileForm(request.POST, request.FILES, instance=volunteer_profile)
         if form.is_valid():
             form.save()
-            return redirect('volunteer-profile', id=volunteer_profile.id)
+            return redirect('volunteer-profile', pk=volunteer_profile.id)
     else:
         form = VolunteerProfileForm(instance=volunteer_profile)
 
-    return render(request, 'volunteers/volunteer_edit.html', {
-        'form': form,
-        'volunteer_profile': volunteer_profile
-    })
-
+    return render(request, 'volunteers/volunteer_edit.html', {'volunteer_profile': volunteer_profile})
+    
+# Delete Volunteer Profile
 @login_required
 @require_POST
 def volunteer_delete(request, id):
@@ -182,35 +179,35 @@ def volunteer_delete(request, id):
     volunteer_profile.delete()
     return redirect('signup')
 
-# Opportunity
+# Apply to Opportunity
 @login_required
 def apply_to_opportunity(request, id):
-
     opportunity = get_object_or_404(Opportunity, id=id)
-
     volunteer_profile = VolunteerProfile.objects.filter(user=request.user).first()
-    
+
     if not volunteer_profile:
         return redirect('create_volunteer_profile')
 
     if Application.objects.filter(volunteer=volunteer_profile, opportunity=opportunity).exists():
         return render(request, 'opportunities/already_applied.html')
 
-    Application.objects.create(volunteer=volunteer_profile, opportunity=opportunity)
+    Application.objects.create(volunteer=volunteer_profile, opportunity=opportunity, user=request.user)
 
-    return redirect('thank_you_for_applying') 
+    return redirect('thank-you-for-applying', opportunity_id=id)
 
+# Opportunity List View
 def opportunity_list(request):
     opportunities = Opportunity.objects.all()
     return render(request, 'opportunities/opportunity_list.html', {'opportunities': opportunities})
 
+# Create Opportunity View
 @login_required
 def create_opportunity(request):
     if request.method == 'POST':
         form = OpportunityForm(request.POST, user=request.user)
         if form.is_valid():
             opportunity = form.save(commit=False)
-            
+
             if request.user.is_superuser:
                 organization_id = request.POST.get('organization')
                 if organization_id:
@@ -225,17 +222,17 @@ def create_opportunity(request):
             opportunity.save()
             return redirect('opportunity-list')
         else:
-            print(form.errors)
+            messages.error(request, 'There was an issue with your form submission. Please try again.')
     else:
         form = OpportunityForm(user=request.user)
 
     return render(request, 'opportunities/create_opportunity.html', {'form': form})
 
-def opportunity_detail(request, id):
-    opportunity = get_object_or_404(Opportunity, id=id)
+# Opportunity Detail View
+def opportunity_detail(request, pk):
+    opportunity = get_object_or_404(Opportunity, pk=pk)
 
     applicants_count = Application.objects.filter(opportunity=opportunity).count()
-
     is_full = applicants_count >= opportunity.num_volunteers_needed
     is_closed = opportunity.is_filled or is_full
 
@@ -243,33 +240,8 @@ def opportunity_detail(request, id):
         'opportunity': opportunity,
         'is_full': is_full,
     })
-    
-def opportunity_update(request, pk):
-    opportunity = get_object_or_404(Opportunity, pk=pk)
 
-    if request.user == opportunity.organization.user or request.user.is_superuser:
-        if request.method == 'POST':
-            form = OpportunityForm(request.POST, instance=opportunity)
-            if form.is_valid():
-                form.save()
-                return redirect('opportunity-detail', pk=opportunity.pk)
-        else:
-            form = OpportunityForm(instance=opportunity)
-
-        return render(request, 'opportunities/opportunity_update.html', {'form': form})
-
-    return redirect('home')
-
-
-def opportunity_delete(request, pk):
-    opportunity = get_object_or_404(Opportunity, pk=pk)
-
-    if request.user == opportunity.organization.user or request.user.is_superuser:
-        opportunity.delete()
-        return redirect('home')
-
-    return redirect('home')
-
+# Opportunity CRUD Views
 class OpportunityUpdate(UpdateView):
     model = Opportunity
     form_class = OpportunityForm
@@ -281,7 +253,7 @@ class OpportunityUpdate(UpdateView):
         if request.user != opportunity.organization.user and not request.user.is_superuser:
             return redirect('home')
         return super().dispatch(request, *args, **kwargs)
-    
+
 class OpportunityDelete(DeleteView):
     model = Opportunity
     template_name = 'opportunities/opportunity_confirm_delete.html'
@@ -292,35 +264,21 @@ class OpportunityDelete(DeleteView):
         if request.user != opportunity.organization.user and not request.user.is_superuser:
             return redirect('home')
         return super().dispatch(request, *args, **kwargs)
-    
+
+# Mark Opportunity as Filled
 @login_required
-def apply_to_opportunity(request, id):
-    opportunity = get_object_or_404(Opportunity, id=id)
+def mark_as_filled(request, pk):
+    opportunity = get_object_or_404(Opportunity, pk=pk)
 
-    volunteer_profile = VolunteerProfile.objects.filter(user=request.user).first()
-
-    if not volunteer_profile:
-        return redirect('create_volunteer_profile')
-
-    if Application.objects.filter(volunteer=volunteer_profile, opportunity=opportunity).exists():
-        return render(request, 'opportunities/already_applied.html')
-
-    Application.objects.create(volunteer=volunteer_profile, opportunity=opportunity)
-
-    return redirect('thank-you-for-applying', opportunity_id=id)
-
-@login_required
-def mark_as_filled(request, id):
-    opportunity = get_object_or_404(Opportunity, id=id)
-    
     if request.user != opportunity.organization.user:
         return redirect('home')
-    
+
     opportunity.is_filled = True
     opportunity.save()
 
-    return redirect('opportunity-detail', id=opportunity.id)
+    return redirect('opportunity-detail', pk=opportunity.pk)
 
+# Thank You After Applying
 @login_required
 def thank_you_for_applying(request, opportunity_id):
     opportunity = get_object_or_404(Opportunity, id=opportunity_id)
@@ -328,34 +286,22 @@ def thank_you_for_applying(request, opportunity_id):
         'opportunity': opportunity
     })
 
-class OpportunityUpdate(UpdateView):
-    model = Opportunity
-    form_class = OpportunityForm
-    template_name = 'opportunities/opportunity_form.html'
-    success_url = reverse_lazy('opportunity-list')
-
-class OpportunityDelete(DeleteView):
-    model = Opportunity
-    template_name = 'opportunities/opportunity_confirm_delete.html'
-    success_url = reverse_lazy('opportunity-list')
-
-# Application
+# List Applicants for Opportunity
 @login_required
 def applicants_list(request, id):
     opportunity = get_object_or_404(Opportunity, id=id)
+
     if request.user != opportunity.organization.user:
         return redirect('home')
-
+    
     applications = Application.objects.filter(opportunity=opportunity).select_related('volunteer')
 
     return render(request, 'opportunities/applicants_list.html', {
         'opportunity': opportunity,
         'applications': applications
     })
-    
 
-# Other
-
+# Email Application Confirmation
 def send_application_email(volunteer, opportunity):
     subject = 'Application Confirmation'
     message = f'You have successfully applied for the opportunity "{opportunity.title}".'
@@ -364,5 +310,4 @@ def send_application_email(volunteer, opportunity):
         message,
         settings.DEFAULT_FROM_EMAIL,
         [volunteer.user.email],
-        fail_silently=False,
     )

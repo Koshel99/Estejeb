@@ -5,10 +5,12 @@ name = "pypi"
 
 [packages]
 django = "*"
-psycopg2-binary = "*"
 whitenoise = "*"
+psycopg2-binary = "*"
+pillow = "*"
 
 [dev-packages]
+psycopg2 = "*"
 
 [requires]
 python_version = "3.8"

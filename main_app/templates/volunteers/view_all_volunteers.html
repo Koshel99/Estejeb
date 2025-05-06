@@ -9,7 +9,7 @@
     <ul>
       {% for volunteer in volunteers %}
         <li>
-          <a href="{% url 'volunteer-profile' volunteer.id %}">
+          <a href="{% url 'volunteer-profile' volunteer.pk %}">
             {{ volunteer.user.username }}
           </a> — Age: {{ volunteer.age }} — Bio: {{ volunteer.bio }}
         </li>
@@ -19,3 +19,4 @@
     <p>No volunteers found.</p>
   {% endif %}
 {% endblock %}
+
