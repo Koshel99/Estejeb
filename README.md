@@ -53,7 +53,7 @@ Whether you're a nonprofit, school, or company looking to make an impact, Esteje
 
 1. **Organizations Register** → Build a profile and post opportunities  
 2. **Guests Browse Listings** → View details and find causes to support  
-3. *(Planned)* **Volunteers Apply** → Submit applications to causes they care about  
+3. **Volunteers Apply** → Submit applications to causes they care about  
 
 ---
 
