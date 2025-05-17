@@ -6,7 +6,7 @@
 
 ## 🌐 Platform Preview
 
-![Estejeb Screenshot](static/images/Screenshot.png)
+<img src="/static/images/Screenshot.png" alt="Screenshot">
 
 ---
 
