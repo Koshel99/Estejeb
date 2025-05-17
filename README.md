@@ -6,7 +6,7 @@
 
 ## 🌐 Platform Preview
 
-<img src="/static/images/Screenshot.png" alt="Screenshot">
+<img src="Screenshot.png" alt="Screenshot">
 
 ---
 
